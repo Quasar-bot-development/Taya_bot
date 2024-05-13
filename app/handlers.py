@@ -26,7 +26,7 @@ with open('./setting.txt','r') as f:
 
 
 SEND_TIME_1 = "10:00:00"
-SEND_TIME_2 = "10:00:01"
+SEND_TIME_2 = "10:11:01"
 SETTING_FILE = SETTING_FILE[1].split('/')
 CURRENT_TIME = datetime.now() #По возможности убрать в БД, глобалить это нельзя
 IS_HOMEWORK_DONE = False #Нужно подтягивать из БД и убрать из глобала
@@ -174,12 +174,6 @@ async def get_age(message: Message,state = FSMContext):
 async def get_tg(message: Message,state = FSMContext):
     await state.update_data(telegram_name = message.text)
     await state.set_state(User_info.instagramm_name)
-    await message.answer('Напиши свой ник в Инстаграм')
-    
-
-@router.message(User_info.instagramm_name)
-async def get_insta(message: Message,state = FSMContext):
-    await state.update_data(instagramm_name = message.text)
     await state.set_state(User_info.request)
     await message.answer("Выбери свой запрос/цель из предложенных или напиши свой вариант:\n"
                         "• Я хочу узнать, кто я\n"
@@ -188,7 +182,7 @@ async def get_insta(message: Message,state = FSMContext):
                         "• Я хочу узнать, как мыслить позитивно каждый день и жить свою лучшую жизнь\n"
                         "• Я хочу узнать, как начать проявляться и зарабатывать на любимом деле\n"
                         "• Напишу свой вариант", reply_markup=kb.request)
-    
+
 
 @router.message(User_info.request)
 async def get_request(message: Message,bot: Bot, state = FSMContext):
@@ -206,7 +200,7 @@ async def get_request(message: Message,bot: Bot, state = FSMContext):
     data = await state.get_data()
     connection = sql.connect('./User_db.db')
     cursor = connection.cursor()
-    cursor.execute('INSERT INTO User (name,age,phone_number, telegram_name,instagramm_name,request, CURRENT_TIME, IS_HOMEWORK_DONE, user_step) VALUES (?,?,?,?,?,?,?,?,?)', (data['name'], data['age'], data['phone_number'],data['telegram_name'], data['instagramm_name'],data['request'], CURRENT_TIME, False, 1))
+    cursor.execute('INSERT INTO User (name,age,phone_number, telegram_name,request, CURRENT_TIME, IS_HOMEWORK_DONE, user_step) VALUES (?,?,?,?,?,?,?,?)', (data['name'], data['age'], data['phone_number'],data['telegram_name'],data['request'], CURRENT_TIME, False, 1))
     connection.commit()
     connection.close()
     
