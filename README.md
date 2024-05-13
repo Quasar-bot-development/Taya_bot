@@ -1,6 +1,8 @@
 # Taya_bot
 Telegram-бот Taya_bot
-<br>
+
+https://github.com/Quasar-telegram-development/Taya_bot/assets/83154713/e8af2ccb-c8e6-461f-89fe-3fa5a3660b0a
+
 
 ## Содержание
 - [Технологии](#технологии)
