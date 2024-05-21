@@ -24,11 +24,11 @@ https://github.com/Quasar-bot-development/Taya_bot/assets/83154713/899ea725-950f
 <br>
 For Windows:
 ```
-git clone https://github.com/Whynot46/Taya_bot
+git clone https://github.com/Quasar-bot-development/Taya_bot
 ```
 For Linux:
 ```
-sudo git clone https://github.com/Whynot46/Taya_bot
+sudo git clone https://github.com/Quasar-bot-development/Taya_bot
 ```
 <hr>
 Установите необходимые библиотеки с помощью команды:
