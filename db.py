@@ -8,8 +8,6 @@ cursor.execute('''
             CREATE TABLE IF NOT EXISTS User (
                 id INTEGER PRIMARY KEY,
                 name TEXT,
-                age INTEGER,
-                phone_number INTEGER,
                 telegram_name TEXT,
                 request TEXT,
                 CURRENT_TIME TEXT,

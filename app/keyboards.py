@@ -7,6 +7,13 @@ main = ReplyKeyboardMarkup(keyboard=[
     input_field_placeholder= 'Выберите действие'
 )
 
+
+create_yourself = main = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='Создать себя')]],
+    resize_keyboard=True
+)
+
+
 request = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Я хочу узнать кто Я'), KeyboardButton(text='Я хочу узнать свою истинную цель')],
     [KeyboardButton(text='Я хочу понять, как уменьшить тревогу и избавиться от стресса')],[KeyboardButton(text='Как мыслить позитивно каждый день и жить свою лучшую жизнь')],

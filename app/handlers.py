@@ -1,6 +1,6 @@
 from aiogram.filters.command import Command
 from aiogram import F, Bot
-from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery, InputMediaPhoto, InputMediaVideo
+from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
 from aiogram.utils.media_group import MediaGroupBuilder
 from aiogram.types import FSInputFile
 from aiogram import Router
@@ -45,8 +45,6 @@ router = Router()
 
 class User_info(StatesGroup):
     name = State()
-    age = State()
-    phone_number = State()
     telegram_name = State()
     request = State()
 
@@ -67,43 +65,49 @@ async def send_news(message: Message, bot: Bot, data):
         await message.answer_photo(caption='<i>«Вы получаете то, что повторяете»</i>', photo=FSInputFile("./img/photo_4.jpg"))
 
     elif user_step==3:
-        await message.answer('Доброе утро 🤍 \nКак ты? Хочу поделиться с тобой отзывами моих учеников 🥰')
-        await asyncio.sleep(TIME_SLEEP)
-        await message.answer('Посмотри, сколько людей мне пишут о своих изменениях и какое воздействие наша работа через арт-терапию оказала на их состояние и жизнь в целом:')
-        await asyncio.sleep(TIME_SLEEP)
+        await message.answer('Доброе утро 🤍\n'
+                            'Как ты? Хочу поделиться с тобой отзывами моих учеников 🥰\n\n'
+                            'Посмотри, сколько людей мне пишут о своих изменениях и какое воздействие наша работа через арт-терапию оказала на их состояние и жизнь в целом:')
+        await asyncio.sleep(5)
         media_group = MediaGroupBuilder(caption="ОЛЯ - бухгалтер, никогда не рисовала. Сначала отдала на занятия в студию свою дочь и в итоге сама начала рисовать🫶🏻\n\n🔥Сейчас у нее уже серия своих работ, планируем персональную выставку.")
         for i in range(1,5):
             media_group.add_photo(type="photo", media=FSInputFile(f"./img/news_{i}.jpg"))
         await message.answer_media_group(media=media_group.build())
-        await asyncio.sleep(TIME_SLEEP)
+        await asyncio.sleep(60)
         media_group = MediaGroupBuilder(caption="ДАНИИЛ - предприниматель, никогда не рисовал\n\nПришел на мою арт-вечеринку в бизнес-клубе и после нее начал создавать самостоятельно картины 🔥\n\nСделал свою собственную мастерскую 🚀")
         for i in range(5, 10):
             media_group.add_photo(media=FSInputFile(f"./img/news_{i}.jpg"))
         await message.answer_media_group(media=media_group.build())
-        await asyncio.sleep(TIME_SLEEP)
+        await asyncio.sleep(60)
         media_group = MediaGroupBuilder(caption="АРТЕМ - проходил у меня поток бизнес-наставничества.\n\n🔥Уже через месяц сделал результат: полностью переупаковали продукт, начал повышать чеки, вышел на высокочековую аудиторию, нанял свою команду!")
         media_group.add_photo(media=FSInputFile("./img/news_10.jpg"))
         media_group.add_video(FSInputFile("./img/news_11.mp4"))
         await message.answer_media_group(media=media_group.build())
-        await asyncio.sleep(TIME_SLEEP)
-        
+        await asyncio.sleep(60)
+        await message.answer("Начни свой путь к лучшей жизни уже сейчас 🫶🏻 и не забудь получить свой подарок в конце видео ❗️")
 
     elif user_step==4:
-        await message.answer('Начни свой путь к лучшей жизни уже сейчас 🫶🏻 и не забудь получить свой подарок в конце видео ❗️')
-        await asyncio.sleep(TIME_SLEEP)
-        await message.answer_photo(caption='<i>«Знать и не делать – все равно что не знать»</i>', photo=FSInputFile("./img/photo_5.jpg"))
-        await asyncio.sleep(TIME_SLEEP)
-        await message.answer_photo(caption='<i>«Не самосовершенствование – а самооткрытие»</i>', photo=FSInputFile("./img/photo_6.jpg"))
-
-    elif user_step==5:
         if IS_HOMEWORK_DONE == 0:
             video_note = FSInputFile('./video/video_2.mp4')
             await message.answer_video_note(video_note=video_note)
         else:
             user_step-=1
-
+            
+    elif user_step==5:
+        await message.answer_photo(caption='<i>«Себя не находят – себя создают»</i>', photo=FSInputFile("./img/photo_1.jpg"))
+        
     elif user_step==6:
+        await message.answer_photo(caption='<i>«Знать и не делать – все равно что не знать»</i>', photo=FSInputFile("./img/photo_5.jpg"))
+
+    elif user_step==7:
+        await message.answer_photo(caption='<i>«Не самосовершенствование – а самооткрытие»</i>', photo=FSInputFile("./img/photo_6.jpg"))
+
+    elif user_step==8:
         await message.answer_photo(caption='<i>«Хорошие привычки делают время союзников. Плохие – врагом»</i>', photo=FSInputFile("./img/photo_7.jpg"))
+        
+    elif user_step==9:  
+        await message.answer_photo(caption='<i>«Все создается дважды. Мы можем переложить ответственность за свою жизнь на наш прошлый опыт, детство, других людей – а можем быть творцами своей жизни взяв за нее ответственность.»</i>', photo=FSInputFile("./img/photo_3.jpg"))
+    
     
     user_step+=1
     connection = sql.connect('./User_db.db')
@@ -129,7 +133,6 @@ async def start_loop(message: Message, bot: Bot, state = FSMContext):
 
 async def start_message(message: Message, bot: Bot, state = FSMContext):
     if is_old(message) == False:
-        data = await state.get_data()
         connection = sql.connect('./User_db.db')
         cursor = connection.cursor()
         user_id = str(message.from_user.id)
@@ -137,19 +140,23 @@ async def start_message(message: Message, bot: Bot, state = FSMContext):
         connection.commit()
         connection.close()
     
-    caption =  "Привет! Рада тебе🩷 Я очень ценю то, что ты доверяешь мне изменение своей жизни в лучшую сторону.\n\nМеня зовут Тая. Я арт-коуч, бизнес-наставник, музыкант и художница с собственным бизнесом, построенном на любимом творческом деле 🎨 \n\nК своим результатам я пришла сама и буду рада поделиться своими секретами, которые успешно работаю в моей жизни и жизни моих учеников. \n\nЯ помогу тебе стать лучшей версией себя 🕊️"
     await asyncio.sleep(TIME_SLEEP)
-    await message.answer_photo(caption=caption, photo=FSInputFile("./img/photo_8.jpg"))
-    await asyncio.sleep(TIME_SLEEP)
-    await message.answer('Чтобы познакомиться со мной поближе я записала для тебя кружочек ⬇️😻')
-    await asyncio.sleep(TIME_SLEEP)
+    await message.answer_photo(caption="Привет! Рада тебе🩷 Я очень ценю то, что ты доверяешь мне изменение своей жизни в лучшую сторону.\n\n"
+                                    "Меня зовут Тая. Я арт-коуч, бизнес-наставник, музыкант и художница с собственным бизнесом, построенном на любимом творческом деле 🎨 \n\n"
+                                    "К своим результатам я пришла сама и буду рада поделиться своими секретами, которые успешно работаю в моей жизни и жизни моих учеников. \n\n"
+                                    "Я помогу тебе стать лучшей версией себя 🕊️"
+                                    , photo=FSInputFile("./img/photo_8.jpg"), reply_markup = kb.create_yourself)
+    
+
+@router.message(F.text == "Создать себя")  
+async def start_loop(message: Message, bot: Bot, state = FSMContext):  
+    await message.answer('Чтобы познакомиться со мной поближе я записала для тебя кружочек ⬇️😻', reply_markup = ReplyKeyboardRemove())
+    await asyncio.sleep(3)
     video_note = FSInputFile('./video/video_1.mp4')
     await message.answer_video_note(video_note=video_note)
-    await asyncio.sleep(TIME_SLEEP)
-    await message.answer_photo(caption='<i>«Себя не находят – себя создают»</i>', photo=FSInputFile("./img/photo_1.jpg"))
-    await asyncio.sleep(TIME_SLEEP)
+    await asyncio.sleep(20)
     await message.answer('Отлично! Теперь ты знаешь меня чуть лучше 🩷\nЯ тоже хочу познакомиться с тобой поближе и сразу после этого пришлю тебе файл, который поможет изменить твою жизнь к лучшему 🫶🏻')
-    await asyncio.sleep(TIME_SLEEP)
+    await asyncio.sleep(3)
     await state.set_state(User_info.name)
     await message.answer('Как тебя зовут?')
 
@@ -157,37 +164,8 @@ async def start_message(message: Message, bot: Bot, state = FSMContext):
 @router.message(User_info.name)
 async def get_name(message: Message,state = FSMContext):
     await state.update_data(name = message.text)
-    await state.set_state(User_info.age)
-    await message.answer('Сколько тебе лет?')
- 
-
-@router.message(User_info.age)
-async def get_age(message: Message,state = FSMContext):
-    if message.text.isdigit():
-        await state.update_data(age = message.text)
-        await state.set_state(User_info.phone_number)
-        await message.answer('Напиши свой номер телефона')
-    else:
-        await state.set_state(User_info.age)
-        await message.answer('Запиши возраст цифрами')
-        await message.answer('Сколько тебе лет?')
-    
-    
-@router.message(User_info.phone_number)
-async def get_age(message: Message,state = FSMContext):
-    try:
-        if is_phone_number(message.text):
-            await state.update_data(phone_number = message.text)
-            await state.set_state(User_info.telegram_name)
-            await message.answer('Напиши свой ник в телеграм')
-        else:
-            await state.set_state(User_info.phone_number)
-            await message.answer('Номер телефона введён некорректно')
-            await message.answer('Напиши свой номер телефона')
-    except:
-        await state.set_state(User_info.phone_number)
-        await message.answer('Номер телефона введён некорректно')
-        await message.answer('Напиши свой номер телефона')
+    await state.set_state(User_info.telegram_name)
+    await message.answer('Напиши свой ник в телеграм')
     
     
 @router.message(User_info.telegram_name)
@@ -198,22 +176,20 @@ async def get_tg(message: Message,state = FSMContext):
 
 
 @router.message(User_info.request)
-async def get_request(message: Message,bot: Bot, state = FSMContext):
+async def get_request(message: Message, bot: Bot, state = FSMContext):
     await state.update_data(request = message.text)
-    await message.answer('Спасибо за твои ответы 🤍\nНиже ты можешь скачать свой гайд 🫶🏻. В нем ты узнаешь:\nКак убрать тревогу\nКак поменять мышление с негативного на позитивное\nКак понять свои точки А и B и как прийти к точке B\n', reply_markup=kb.download_inline_keyboard)
-    await asyncio.sleep(TIME_SLEEP)
+    await message.answer('Спасибо за твои ответы 🤍\nНиже ты можешь скачать свой гайд 🫶🏻', reply_markup=kb.download_inline_keyboard)
+    await asyncio.sleep(20)
     await message.answer_photo(caption='<i>«Единственные ограничения – те, что живут в нашем разуме»</i>', photo=FSInputFile("./img/photo_2.jpg"), reply_markup=ReplyKeyboardRemove())
     await asyncio.sleep(TIME_SLEEP)
-    await message.answer('''К своим результатам по работе над мышлением (а все начинается именно с него!) я пришла благодаря разным техникам и практикам. В гайде не получится уместить все, но я выбрала <b>САМЫЕ ПРОСТЫЕ И ДЕЙСТВЕННЫЕ</b>. Эти практики я и мои ученики используем регулярно, и они действительно работают! 🔥\n\nНО! для того чтобы в твоей жизни начались позитивные изменения, необходимо следовать «<b>всем моим инструкциям</b>» из гайда.\n\nДля дополнительной мотивации в конце гайда тебя ждет <b>подарок</b> 🩷\n\n<i>p.s. торопись, подарок смогут забрать только первые 20 человек 🫶🏻</i>''')
-    await asyncio.sleep(TIME_SLEEP)
-    await message.answer_photo(caption='<i>«Все создается дважды. Мы можем переложить ответственность за свою жизнь на наш прошлый опыт, детство, других людей – а можем быть творцами своей жизни взяв за нее ответственность.»</i>', photo=FSInputFile("./img/photo_3.jpg"))
-    await asyncio.sleep(TIME_SLEEP)
+    await message.answer('''К своим результатам по работе над мышлением (а все начинается именно с него!) я пришла благодаря разным техникам и практикам. В гайде не получится уместить все, но я выбрала <b>САМЫЕ ПРОСТЫЕ И ДЕЙСТВЕННЫЕ</b>. Эти практики я и мои ученики используем регулярно, и они действительно работают! 🔥\n\nНО! для того чтобы в твоей жизни начались позитивные изменения, необходимо следовать всем моим инструкциям из гайда.\n\nДля дополнительной мотивации в конце гайда тебя ждет <b>подарок</b> 🩷\n\n<i>p.s. торопись, подарок смогут забрать только первые 20 человек 🫶🏻</i>''')
+    await asyncio.sleep(5)
     await message.answer('Твоим домашним заданием будет выполнить арт-терапию, которую ты найдешь в конце этого гайда и прислать её результаты (фото) мне в директ (или сюда в бота)😻')
     data = await state.get_data()
     connection = sql.connect('./User_db.db')
     cursor = connection.cursor()
     user_id = str(message.from_user.id)
-    cursor.execute('UPDATE User set name=?, age=?, phone_number=?, telegram_name=?, request=?, CURRENT_TIME=? WHERE telegram_id =?', (data['name'], data['age'], data['phone_number'],data['telegram_name'],data['request'], CURRENT_TIME, user_id))
+    cursor.execute('UPDATE User set name=?, telegram_name=?, request=?, CURRENT_TIME=? WHERE telegram_id =?', (data['name'], data['age'], data['phone_number'],data['telegram_name'],data['request'], CURRENT_TIME, user_id))
     connection.commit()
     connection.close()
     
