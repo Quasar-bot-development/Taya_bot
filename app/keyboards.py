@@ -8,10 +8,9 @@ main = ReplyKeyboardMarkup(keyboard=[
 )
 
 
-create_yourself = main = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Создать себя')]],
-    resize_keyboard=True
-)
+create_yourself = InlineKeyboardMarkup(
+    inline_keyboard=[[InlineKeyboardButton(text='Создать себя', 
+                                           callback_data='create_yourself')]])
 
 
 request = ReplyKeyboardMarkup(keyboard=[

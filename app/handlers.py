@@ -123,7 +123,7 @@ async def start_loop(message: Message, bot: Bot, state = FSMContext):
     await start_message(message, bot, state)
     await asyncio.sleep(10)
     while True:
-        await asyncio.sleep(TIME_SLEEP)
+        await asyncio.sleep(1)
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
         if current_time == SEND_TIME_1 or current_time == SEND_TIME_2: 
@@ -148,18 +148,18 @@ async def start_message(message: Message, bot: Bot, state = FSMContext):
                                     , photo=FSInputFile("./img/photo_8.jpg"), reply_markup = kb.create_yourself)
     
 
-@router.message(F.text == "Создать себя")  
-async def start_loop(message: Message, bot: Bot, state = FSMContext):  
-    await message.answer('Чтобы познакомиться со мной поближе я записала для тебя кружочек ⬇️😻', reply_markup = ReplyKeyboardRemove())
+@router.callback_query(lambda c: c.data == "create_yourself") 
+async def create_yourself(callback_query: CallbackQuery, state = FSMContext): 
+    await callback_query.message.answer('Чтобы познакомиться со мной поближе я записала для тебя кружочек ⬇️😻', reply_markup = ReplyKeyboardRemove())
     await asyncio.sleep(3)
     video_note = FSInputFile('./video/video_1.mp4')
-    await message.answer_video_note(video_note=video_note)
+    await callback_query.message.answer_video_note(video_note=video_note)
     await asyncio.sleep(20)
-    await message.answer('Отлично! Теперь ты знаешь меня чуть лучше 🩷\nЯ тоже хочу познакомиться с тобой поближе и сразу после этого пришлю тебе файл, который поможет изменить твою жизнь к лучшему 🫶🏻')
+    await callback_query.message.answer('Отлично! Теперь ты знаешь меня чуть лучше 🩷\nЯ тоже хочу познакомиться с тобой поближе и сразу после этого пришлю тебе файл, который поможет изменить твою жизнь к лучшему 🫶🏻')
     await asyncio.sleep(3)
     await state.set_state(User_info.name)
-    await message.answer('Как тебя зовут?')
-
+    await callback_query.message.answer('Как тебя зовут?')
+    
 
 @router.message(User_info.name)
 async def get_name(message: Message,state = FSMContext):
@@ -189,7 +189,7 @@ async def get_request(message: Message, bot: Bot, state = FSMContext):
     connection = sql.connect('./User_db.db')
     cursor = connection.cursor()
     user_id = str(message.from_user.id)
-    cursor.execute('UPDATE User set name=?, telegram_name=?, request=?, CURRENT_TIME=? WHERE telegram_id =?', (data['name'], data['age'], data['phone_number'],data['telegram_name'],data['request'], CURRENT_TIME, user_id))
+    cursor.execute('UPDATE User set name=?, telegram_name=?, request=?, CURRENT_TIME=? WHERE telegram_id =?', (data['name'],data['telegram_name'],data['request'], CURRENT_TIME, user_id))
     connection.commit()
     connection.close()
     
@@ -222,6 +222,7 @@ async def start_loop(message: Message, bot: Bot):
 @router.callback_query(lambda c: c.data == "download_guide") 
 async def handle_download_button(callback_query: CallbackQuery): 
     await callback_query.message.answer_document(document=FSInputFile("./doc/Taya_guide.pdf"))
+    
     
 def is_old(message):
     connection = sql.connect('User_db.db')
