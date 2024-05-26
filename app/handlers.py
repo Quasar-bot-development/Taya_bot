@@ -47,6 +47,7 @@ class User_info(StatesGroup):
     name = State()
     telegram_name = State()
     request = State()
+    photo = State()
 
 
 async def send_news(message: Message, bot: Bot, data):
@@ -192,21 +193,23 @@ async def get_request(message: Message, bot: Bot, state = FSMContext):
     cursor.execute('UPDATE User set name=?, telegram_name=?, request=?, CURRENT_TIME=? WHERE telegram_id =?', (data['name'],data['telegram_name'],data['request'], CURRENT_TIME, user_id))
     connection.commit()
     connection.close()
+    await state.set_state(User_info.photo)
+    
     
 
-@router.message(F.photo)
-async def home_work(message: Message, bot: Bot, state = FSMContext):
+@router.message(User_info.photo)
+async def handle_home_work_photo(message: Message, bot: Bot):
     await message.answer('Молодец😻')
-    #Отправка сообщения всем админам
+    # Отправка сообщения всем админам
     for current_id in ADMIN_ID:
         await bot.forward_message(chat_id=current_id, from_chat_id=message.chat.id, message_id=message.message_id)
-    data = await state.get_data()
     connection = sql.connect('./User_db.db')
     cursor = connection.cursor()
     user_id = str(message.from_user.id)
-    cursor.execute('Update User set IS_HOMEWORK_DONE = True WHERE telegram_id = ?',(user_id))
+    cursor.execute('Update User set IS_HOMEWORK_DONE = True WHERE telegram_id =?',(user_id))
     connection.commit()
     connection.close()
+    
     
 @router.message(F.text == "/users")  
 async def start_loop(message: Message, bot: Bot):  
