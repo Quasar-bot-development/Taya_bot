@@ -88,11 +88,8 @@ async def send_news(message: Message, bot: Bot, data):
         await message.answer("Начни свой путь к лучшей жизни уже сейчас 🫶🏻 и не забудь получить свой подарок в конце видео ❗️")
 
     elif user_step==4:
-        if IS_HOMEWORK_DONE == 0:
-            video_note = FSInputFile('./video/video_2.mp4')
-            await message.answer_video_note(video_note=video_note)
-        else:
-            user_step-=1
+        video_note = FSInputFile('./video/video_2.mp4')
+        await message.answer_video_note(video_note=video_note)
             
     elif user_step==5:
         await message.answer_photo(caption='<i>«Себя не находят – себя создают»</i>', photo=FSInputFile("./img/photo_1.jpg"))
@@ -111,6 +108,9 @@ async def send_news(message: Message, bot: Bot, data):
         
     elif user_step==10:
         await message.answer_photo(caption='<i>«Единственные ограничения – те, что живут в нашем разуме»</i>', photo=FSInputFile("./img/photo_2.jpg"))
+        
+    else:
+        user_step-=1
     
     
     user_step+=1
@@ -130,9 +130,10 @@ async def start_loop(message: Message, bot: Bot, state = FSMContext):
         await asyncio.sleep(1)
         now = datetime.now()
         current_time = now.strftime("%H:%M:%S")
-        if current_time == SEND_TIME_1 or current_time == SEND_TIME_2: 
-            data = await state.get_data()
-            await send_news(message, bot, data)
+        # if current_time == SEND_TIME_1 or current_time == SEND_TIME_2: 
+        asyncio.sleep(120)
+        data = await state.get_data()
+        await send_news(message, bot, data)
 
 
 async def start_message(message: Message, bot: Bot, state = FSMContext):
@@ -143,11 +144,10 @@ async def start_message(message: Message, bot: Bot, state = FSMContext):
         cursor.execute('INSERT INTO User (IS_HOMEWORK_DONE, user_step, telegram_id) VALUES (?,?,?)', (False, 1, user_id))
         connection.commit()
         connection.close()
-    
-    await asyncio.sleep(TIME_SLEEP)
+
     await message.answer_photo(caption="Привет! Рада тебе🩷 Я очень ценю то, что ты доверяешь мне изменение своей жизни в лучшую сторону.\n\n"
                                     "Меня зовут Тая. Я арт-коуч, бизнес-наставник, музыкант и художница с собственным бизнесом, построенном на любимом творческом деле 🎨 \n\n"
-                                    "К своим результатам я пришла сама и буду рада поделиться своими секретами, которые успешно работаю в моей жизни и жизни моих учеников. \n\n"
+                                    "К своим результатам я пришла сама и буду рада поделиться своими секретами, которые успешно работают в моей жизни и жизни моих учеников. \n\n"
                                     "Я помогу тебе стать лучшей версией себя 🕊️"
                                     , photo=FSInputFile("./img/photo_8.jpg"), reply_markup = kb.create_yourself)
     
@@ -216,7 +216,7 @@ async def handle_home_work_photo(message: Message, bot: Bot):
 async def start_loop(message: Message, bot: Bot):  
     if str(message.from_user.id) in ADMIN_ID:  
         conn = sql.connect('User_db.db') 
-        df = pd.read_sql_query('SELECT name, age, phone_number, telegram_name, request, CURRENT_TIME, IS_HOMEWORK_DONE, user_step FROM User', conn) 
+        df = pd.read_sql_query('SELECT name, telegram_name, request, CURRENT_TIME, IS_HOMEWORK_DONE, user_step, telegram_id FROM User', conn) 
         df.to_excel("data.xlsx", index=False)  
         conn.close() 
         await message.answer_document(document=FSInputFile("data.xlsx")) 
